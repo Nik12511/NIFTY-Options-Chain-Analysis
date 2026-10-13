@@ -141,3 +141,9 @@ docker compose run --rm --no-deps dashboard python -m nifty_options.pipeline --o
 docker compose start dashboard
 ```
 
+## Vercel deployment
+
+Vercel's Python Functions runtime expects a Python web-handler entrypoint. This Streamlit script starts its own server, so it is not a Python Function entrypoint. For Vercel's container deployment, the repository includes a root-level `Dockerfile.vercel`; it starts Streamlit on `PORT=8501`. Keep Vercel's project **Root Directory** set to the repository root and set the Vercel project environment variable `PORT` to `8501`, then push a commit containing `Dockerfile.vercel` and redeploy. The CI workflow builds this image as well as the local Compose image.
+
+This only deploys the web process. Vercel container instances are stateless, and this repository's local DuckDB file and ignored CSV data are not included in Git or persisted by Vercel. The dashboard therefore needs a durable external database and a configured data-import process before it can show persistent, up-to-date market data. Do not enable the in-process scheduler on Vercel. See [architecture and data model](docs/architecture.md#technology-choices-and-trade-offs) for the storage trade-offs.
+

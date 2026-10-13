@@ -49,3 +49,6 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t nifty-options-analytics:${{ github.sha }} .
+
+      - name: Build Vercel container image
+        run: docker build -f Dockerfile.vercel -t nifty-options-analytics-vercel:${{ github.sha }} .
