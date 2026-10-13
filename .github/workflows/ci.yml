@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-test-build:
+    name: Quality, tests, and wheel build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements-dev.lock
+
+      - name: Install locked development dependencies
+        run: python -m pip install -r requirements-dev.lock
+
+      - name: Install project package
+        run: python -m pip install --no-deps -e .
+
+      - name: Lint
+        run: python -m ruff check .
+
+      - name: Check formatting
+        run: python -m ruff format --check .
+
+      - name: Type check
+        run: python -m mypy src/nifty_options
+
+      - name: Run tests
+        run: python -m pytest
+
+      - name: Build wheel
+        run: python -m pip wheel --no-deps --wheel-dir dist .
+
+      - name: Build Docker image
+        run: docker build -t nifty-options-analytics:${{ github.sha }} .

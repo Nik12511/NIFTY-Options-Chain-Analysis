@@ -1,0 +1,28 @@
+services:
+  dashboard:
+    build:
+      context: .
+    image: nifty-options-analytics:local
+    restart: unless-stopped
+    init: true
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-8501}:8501"
+    environment:
+      DATABASE_PATH: /app/data/nifty_options.duckdb
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      ALERT_WEBHOOK_URL: "${ALERT_WEBHOOK_URL:-}"
+      MAX_CSV_BYTES: "${MAX_CSV_BYTES:-104857600}"
+      HTTP_TIMEOUT_SECONDS: "${HTTP_TIMEOUT_SECONDS:-15}"
+      HTTP_MAX_ATTEMPTS: "${HTTP_MAX_ATTEMPTS:-4}"
+      HTTP_MIN_INTERVAL_SECONDS: "${HTTP_MIN_INTERVAL_SECONDS:-1}"
+      HTTP_MAX_RESPONSE_BYTES: "${HTTP_MAX_RESPONSE_BYTES:-26214400}"
+      SCHEDULER_ENABLED: "${SCHEDULER_ENABLED:-false}"
+      SCHEDULER_TIME: "${SCHEDULER_TIME:-18:15}"
+      OPTIONS_CSV: "${OPTIONS_CSV:-data/raw/options.csv}"
+      PRICES_CSV: "${PRICES_CSV:-data/raw/prices.csv}"
+    volumes:
+      - ./data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
