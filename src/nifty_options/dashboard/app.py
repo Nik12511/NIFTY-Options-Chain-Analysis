@@ -1,5 +1,6 @@
 """Dashboard for stored price indicators and options-chain analytics."""
 
+import os
 from pathlib import Path
 from threading import Thread
 
@@ -23,6 +24,11 @@ def initialize_scheduler() -> Thread | None:
 
 initialize_scheduler()
 st.title("BankNifty Options Analytics")
+if os.getenv("DEMO_DATA", "").strip().casefold() == "true":
+    st.warning(
+        "SYNTHETIC DEMO DATA — This bundled dataset is illustrative, not live market data. "
+        "Do not use it for trading or investment decisions."
+    )
 database_path = settings.database_path
 
 
